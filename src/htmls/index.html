@@ -1,10 +1,73 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <script src="https://d3js.org/d3.v3.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/hari-sh/rollup_template/app/dist/plt.js"></script>
+        <script>
+            const loadScript = (FILE_URL, async = true, type = "text/javascript") => {
+            return new Promise((resolve, reject) => {
+                try {
+                    const scriptEle = document.createElement("script");
+                    scriptEle.type = type;
+                    scriptEle.async = async;
+                    scriptEle.src =FILE_URL;
+
+                    scriptEle.addEventListener("load", (ev) => {
+                        resolve({ status: true });
+                    });
+
+                    scriptEle.addEventListener("error", (ev) => {
+                        reject({
+                            status: false,
+                            message: `Failed to load the script {FILE_URL}`
+                        });
+                    });
+
+                    document.body.appendChild(scriptEle);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        };
+
+        const loadStyle = (FILE_URL, async = true, type = "stylesheet") => {
+            return new Promise((resolve, reject) => {
+                try {
+                    const scriptEle = document.createElement("link");
+                    scriptEle.rel = type;
+                    scriptEle.async = async;
+                    scriptEle.href =FILE_URL;
+
+                    scriptEle.addEventListener("load", (ev) => {
+                        resolve({ status: true });
+                    });
+
+                    scriptEle.addEventListener("error", (ev) => {
+                        reject({
+                            status: false,
+                            message: `Failed to load the script {FILE_URL}`
+                        });
+                    });
+
+                    document.body.appendChild(scriptEle);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        };
+        let resVal = true;
+
+        loadStyle("https://cdn.jsdelivr.net/gh/hari-sh/rollup_template/app/style.css").then(data => {});
+        loadScript("https://d3js.org/d3.v3.min.js")
+            .then( data  => {
+                console.log("D3 loaded successfully", data);
+                loadScript("https://cdn.jsdelivr.net/gh/hari-sh/rollup_template/app/dist/plt.js")
+                    .then( data  => {
+                        console.log("Plot loaded successfully", data);
+                    })
+                    .catch(retVal = false);
+            })
+            .catch( retVal = false);
+        </script>
     </body>
 </html>
