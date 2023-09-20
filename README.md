@@ -1,1 +1,1 @@
-Basic template for bundling vanila js node project
+# Basic template for bundling vanila js node project
