@@ -6,6 +6,7 @@ import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
+import copy from 'rollup-plugin-copy';
 
 const srcDir = 'src/scripts/';
 const distDir = 'app/dist/';
@@ -23,7 +24,7 @@ const plugins = () => [
     }),
     replace({
         exclude: 'node_modules/**',
-        preventAssignment:true,
+        preventAssignment: true,
         ENV: JSON.stringify(process.env.NODE_ENV || 'development')
     }),
     (process.env.NODE_ENV === 'production' && terser()),
@@ -33,24 +34,31 @@ const plugins = () => [
         extract: true,
         sourceMap: (process.env.NODE_ENV === 'production' ? false : 'inline'),
         minimize: (process.env.NODE_ENV === 'production')
+    }),
+    copy({
+        targets: [
+            {
+                src: ['src/htmls/index.html', 'src/styles/style.css'],
+                dest: 'app/'
+            }]
     })
 ]
 
-function setupBuild(src, dist, name){
+function setupBuild(src, dist, name) {
     return {
-        input: srcDir+src,
+        input: srcDir + src,
         output: {
-            file: distDir+dist,
+            file: distDir + dist,
             format: 'iife',
             name,
-            globals:{d3: 'd3'},
+            globals: { d3: 'd3' },
             sourcemap: (process.env.NODE_ENV === 'production' ? false : 'inline')
         },
-        external:['d3'],
-        plugins:plugins(),
-        onwarn: function(warning, warner){
-            if (warning.code === 'CIRCULAR_DEPENDENCY'){
-                if(warning.importer && warning.importer.startsWith('node_modules/')){
+        external: ['d3'],
+        plugins: plugins(),
+        onwarn: function (warning, warner) {
+            if (warning.code === 'CIRCULAR_DEPENDENCY') {
+                if (warning.importer && warning.importer.startsWith('node_modules/')) {
                     return;
                 }
             }
@@ -59,6 +67,6 @@ function setupBuild(src, dist, name){
     }
 }
 
-export default[
+export default [
     setupBuild('plotter.js', 'plt.js', 'plt')
 ]
